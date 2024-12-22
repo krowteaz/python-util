@@ -8,24 +8,53 @@ on:
 jobs:
   install-kubectl:
     runs-on: self-hosted
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Fetch and verify kubectl version
         run: |
-          # Fetch the latest stable version of kubectl
-          VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
-          echo "Latest kubectl version: $VERSION"
+          log_message "Starting installation of Docker"
+          # Installing Docker
+          sudo apt update
+          sudo apt -y install docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          log_message "Finished installation of Docker"
+
+          log_message "Starting installation of Kubernetes."
+          # Installing Kubernetes
+          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes-xenial.gpg
+          sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+          sudo apt update
+          sudo apt install -y kubeadm kubelet kubectl
+          sudo apt-mark hold kubelet kubeadm kubectl
+          sudo swapoff -a
+          sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+          sudo kubeadm init
+          echo "Kubernetes successfully installed in the system"
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+          echo "Successfully added firewall rules needed for Kubernetes"
+          
+          sudo mkdir -p /etc/containerd
+          sudo apt install -y containerd
+          sudo containerd config default | sudo tee /etc/containerd/config.toml
+          sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+          sudo systemctl daemon-reload
+          sudo systemctl restart containerd
+          log_message "Finished installation of Kubernetes."
 
       - name: Download kubectl using stable version
         run: |
+          # Fetch the latest stable version of kubectl
+          VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
+          
           # Construct the URL to download kubectl and ensure it's correct
           URL="https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
           echo "Download URL: $URL"
           curl -LO "$URL"
-        
+
       - name: Install kubectl
         run: |
           # Make kubectl executable
