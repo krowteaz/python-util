@@ -1,0 +1,36 @@
+name: Remove Kubernetes and Docker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remove_kubernetes_docker:
+    runs-on: self-hosted
+
+    steps:
+    - name: Set up the environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl gnupg lsb-release
+
+    - name: Remove Kubernetes (for self-managed cluster)
+      run: |
+        # Stopping and removing kubelet and kubectl
+        sudo systemctl stop kubelet
+        sudo apt-get purge -y kubelet kubectl kubeadm kubernetes-cni
+        sudo apt-get autoremove -y
+        sudo rm -rf /etc/kubernetes /var/lib/etcd /var/lib/kubelet
+        sudo systemctl daemon-reload
+
+    - name: Remove Docker
+      run: |
+        # Uninstalling Docker packages
+        sudo apt-get remove -y docker docker-engine docker.io containerd runc
+        sudo apt-get purge -y docker docker-engine docker.io containerd runc
+        sudo apt-get autoremove -y
+        sudo rm -rf /var/lib/docker /etc/docker /var/run/docker.sock
+
+    - name: Clean up
+      run: |
+        sudo apt-get clean
+        sudo rm -rf /var/cache/apt/archives/*
