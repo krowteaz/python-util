@@ -13,14 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install kubectl
+      - name: Fetch the latest stable kubectl version
         run: |
           # Fetch the latest stable version of kubectl
           VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
-          
+          echo "Latest kubectl version: $VERSION"
+
+      - name: Download kubectl
+        run: |
           # Download the latest stable version of kubectl
           curl -LO "https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
-          
+
+      - name: Install kubectl
+        run: |
           # Make kubectl executable
           chmod +x ./kubectl
           
