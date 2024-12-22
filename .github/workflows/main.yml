@@ -1,5 +1,4 @@
-name: Check System Status
-
+name: Python Util
 on:
   schedule:
     - cron: '0 * * * *' # Runs every hour
