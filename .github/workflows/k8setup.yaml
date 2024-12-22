@@ -1,4 +1,4 @@
-name: Set up Kubernetes
+name: Install Latest kubectl
 
 on:
   push:
@@ -6,17 +6,23 @@ on:
       - main
 
 jobs:
-  install-kubernetes:
+  install-kubectl:
     runs-on: self-hosted
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Kubernetes
-        uses: azure/setup-kubernetes@v1
-        with:
-          version: latest  # This will install the latest version of kubectl
+      - name: Install kubectl
+        run: |
+          # Download the latest stable version of kubectl
+          curl -LO "https://dl.k8s.io/release/v$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          
+          # Make kubectl executable
+          chmod +x ./kubectl
+          
+          # Move kubectl to /usr/local/bin
+          sudo mv ./kubectl /usr/local/bin/kubectl
 
       - name: Verify kubectl version
         run: kubectl version --client
