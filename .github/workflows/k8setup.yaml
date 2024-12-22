@@ -46,10 +46,6 @@ jobs:
           K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
           curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
 
-      - name: Install kubectl
-        run: |
-          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
 
@@ -60,7 +56,6 @@ jobs:
       - name: Install kubeadm, kubelet, and kubectl
         run: |
           sudo apt install -y kubelet kubeadm kubectl
-
 
       - name: Install and configure containerd
         run: |
@@ -78,10 +73,9 @@ jobs:
       - name: Initialize Kubernetes master node
         run: |
           sudo kubeadm init
-          export KUBECONFIG=/etc/kubernetes/admin.conf
-
-      - name: Set up kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-          sudo chown $(id -u):$(id -g) $HOME/.kube/config
+          sudo cp /etc/kubernetes/admin.conf $HOME/
+          sudo chown $(id -u):$(id -g) $HOME/admin.conf
+          export KUBECONFIG=$HOME/admin.conf
+          echo 'export KUBECONFIG=$HOME/admin.conf' >> $HOME/.bashrc
+          echo "Check Status of Cluster"
+          kubectl get nodes
