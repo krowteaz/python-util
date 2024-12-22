@@ -1,0 +1,22 @@
+name: Set up Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  install-kubernetes:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Kubernetes
+        uses: azure/setup-kubernetes@v1
+        with:
+          version: latest  # This will install the latest version of kubectl
+
+      - name: Verify kubectl version
+        run: kubectl version --client
