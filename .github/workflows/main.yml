@@ -6,7 +6,9 @@ on:
 
 jobs:
   check-status:
-    runs-on: ubuntu-latest
+ #   runs-on: ubuntu-latest
+ # Use this YAML in your workflow file for each job
+     runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
