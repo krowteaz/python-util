@@ -71,6 +71,10 @@ jobs:
           sudo systemctl daemon-reload
           sudo systemctl restart containerd
 
+      - name: Remove existing Kubernetes master node
+        run: |
+          sudo kubeadm reset -f
+
       - name: Initialize Kubernetes master node
         run: |
           sudo kubeadm init
