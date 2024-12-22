@@ -61,12 +61,6 @@ jobs:
         run: |
           sudo apt install -y kubelet kubeadm kubectl
 
-      - name: Install containerd if needed
-        run: |
-          sudo apt -y install containerd
-          sudo systemctl enable containerd
-          sudo systemctl start containerd
-          sudo systemctl status containerd
 
       - name: Install and configure containerd
         run: |
@@ -80,6 +74,7 @@ jobs:
       - name: Initialize Kubernetes master node
         run: |
           sudo kubeadm init
+          export KUBECONFIG=/etc/kubernetes/admin.conf
 
       - name: Set up kubeconfig
         run: |
