@@ -13,43 +13,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Fetch and verify kubectl version
+      - name: Install Docker
         run: |
-          # Function to log messages
-          log_message() {
-            echo "$1"
-          }
-
           # Installing Docker
-          log_message "Starting installation of Docker"
           sudo apt update
           sudo apt -y install docker.io
           sudo systemctl start docker
           sudo systemctl enable docker
-          log_message "Finished installation of Docker"
+          echo "Docker installation complete."
 
-          # Installing Kubernetes
-          log_message "Starting installation of Kubernetes."
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes-xenial.gpg
-          sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+      - name: Install Kubernetes and fix GPG key
+        run: |
+          # Fix GPG key for Kubernetes repository
+          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          
+          # Add Kubernetes repository
+          sudo apt-add-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+          
+          # Update package list
           sudo apt update
+
+          # Install kubeadm, kubelet, and kubectl
           sudo apt install -y kubeadm kubelet kubectl
           sudo apt-mark hold kubelet kubeadm kubectl
+
+          # Disable swap for Kubernetes
           sudo swapoff -a
           sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
           sudo kubeadm init
-          echo "Kubernetes successfully installed in the system"
-          export KUBECONFIG=/etc/kubernetes/admin.conf
-          echo "Successfully added firewall rules needed for Kubernetes"
+          echo "Kubernetes successfully installed."
 
-          # Installing containerd
+          # Set KUBECONFIG for Kubernetes
+          export KUBECONFIG=/etc/kubernetes/admin.conf
+          echo "Kubeconfig set for Kubernetes."
+
+          # Install containerd
           sudo mkdir -p /etc/containerd
           sudo apt install -y containerd
           sudo containerd config default | sudo tee /etc/containerd/config.toml
           sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
           sudo systemctl daemon-reload
           sudo systemctl restart containerd
-          log_message "Finished installation of Kubernetes."
+          echo "Containerd installation complete."
 
       - name: Download kubectl using stable version
         run: |
