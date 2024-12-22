@@ -1,0 +1,27 @@
+name: Check System Status
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch: # Allows manual trigger of the workflow
+
+jobs:
+  check-status:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' # Specify the Python version
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install psutil
+
+      - name: Run System Status Check
+        run: python python-util.py
