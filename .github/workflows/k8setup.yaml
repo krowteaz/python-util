@@ -79,3 +79,9 @@ jobs:
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
 
+      - name: Initialize Kubernetes master node
+        run: |
+          kubectl apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml
+          kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+          kubectl taint nodes --all key:NoSchedule
+
