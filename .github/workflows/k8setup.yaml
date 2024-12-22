@@ -79,11 +79,20 @@ jobs:
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
 
-      - name: Download Calico YAML and Apply Calico YAML with kubectl
+      - name: Install curl
+        run: sudo apt-get install -y curl
+
+      - name: Download and Apply Calico
         run: |
-          sudo curl -O https://docs.projectcalico.org/manifests/calico.yaml
-          export KUBECONFIG=$HOME/admin.conf
-          kubectl apply -f calico.yaml --validate=false
+          curl -LO https://projectcalico.docs.tigera.io/manifests/calico.yaml
+          if [ -s calico.yaml ]; then
+            kubectl apply -f calico.yaml --validate=false
+          else
+            echo "Calico manifest download failed." && exit 1
+          fi
+
+      - name: Untaint Control-Plane Nodes
+        run: |
           kubectl taint nodes --all node-role.kubernetes.io/control-plane-
           kubectl taint nodes --all key:NoSchedule-
 
