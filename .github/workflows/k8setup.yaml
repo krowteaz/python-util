@@ -79,9 +79,10 @@ jobs:
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
 
-      - name: Initialize Kubernetes master node
+      - name: Install Calico Network
         run: |
-          sudo kubectl apply -f https://docs.projectcalico.org/v3.25/manifests/calico.yaml
+          export KUBECONFIG=$HOME/admin.conf
+          sudo kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
           sudo kubectl taint nodes --all node-role.kubernetes.io/control-plane-
           sudo kubectl taint nodes --all key:NoSchedule
 
