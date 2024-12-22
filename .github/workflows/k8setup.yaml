@@ -7,7 +7,7 @@ on:
 
 jobs:
   install-kubectl:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
@@ -18,6 +18,13 @@ jobs:
           # Fetch the latest stable version of kubectl
           VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
           echo "Latest kubectl version: $VERSION"
+
+      - name: Verify kubectl URL
+        run: |
+          # Construct the URL to download kubectl and verify the URL
+          URL="https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
+          echo "kubectl download URL: $URL"
+          curl -I "$URL"  # Use curl to check the header of the URL
 
       - name: Download kubectl
         run: |
