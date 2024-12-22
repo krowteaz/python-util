@@ -13,27 +13,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker (Latest Version)
-        run: |
-          # Update the package database and install required dependencies
-          sudo apt-get update
-          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    - name: Remove conflicting Kubernetes GPG key (if exists)
+      run: |
+        sudo rm -f /etc/apt/keyrings/kubernetes.gpg
 
-          # Add Docker’s official GPG key
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    - name: Add Docker GPG key
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-          # Set up the stable Docker repository
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - name: Set up Docker repository
+      run: |
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-          # Install the latest version of Docker
-          sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    - name: Re-add Kubernetes GPG key (if needed)
+      run: |
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
 
-      - name: Verify Docker installation (Latest Version)
-        run: docker --version
+    - name: Update package database
+      run: |
+        sudo apt-get update
 
+    - name: Install Docker dependencies
+      run: |
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
-        
+    - name: Install Docker
+      run: |
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
   
       - name: Download kubectl binary
         run: |
