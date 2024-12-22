@@ -84,7 +84,7 @@ jobs:
 
       - name: Download and Apply Calico
         run: |
-          curl -LO https://projectcalico.docs.tigera.io/manifests/calico.yaml
+          curl -LO https://docs.tigera.io/archive/v3.25/manifests/calico.yaml
           if [ -s calico.yaml ]; then
             kubectl apply -f calico.yaml --validate=false
           else
