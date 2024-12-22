@@ -10,53 +10,50 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Download kubectl binary
-      run: |
-        K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
-        curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
+      - name: Download kubectl binary
+        run: |
+          K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+          curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
 
-    - name: Install kubectl
-      run: |
-        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      - name: Install kubectl
+        run: |
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-    - name: Verify kubectl installation
-      run: kubectl version --client --output=yaml
+      - name: Verify kubectl installation
+        run: kubectl version --client --output=yaml
 
-    - name: Install Docker
-      run: |
-        sudo apt update
-        sudo apt -y install docker.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
+      - name: Install Docker
+        run: |
+          sudo apt update
+          sudo apt -y install docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
 
-    - name: Verify Docker installation
-      run: docker --version
+      - name: Verify Docker installation
+        run: docker --version
 
-    - name: Install kubeadm, kubelet, and kubectl
-      run: |
-        sudo apt update
-        sudo apt install -y apt-transport-https curl
-        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/trusted.gpg.d/kubernetes.asc
-        sudo apt update
-        sudo apt install -y kubelet kubeadm kubectl
+      - name: Install kubeadm, kubelet, and kubectl
+        run: |
+          sudo apt update
+          sudo apt install -y apt-transport-https curl
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/trusted.gpg.d/kubernetes.asc
+          sudo apt update
+          sudo apt install -y kubelet kubeadm kubectl
 
-    - name: Initialize Kubernetes master node
-      run: |
-        sudo kubeadm init
+      - name: Initialize Kubernetes master node
+        run: |
+          sudo kubeadm init
 
-    - name: Set up kubeconfig
-      run: |
-        mkdir -p $HOME/.kube
-        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+          sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-    - name: Verify Kubernetes setup
-      run: kubectl get nodes
-
-      - name: Set up Docker
+      - name: Set up Docker (Latest Version)
         run: |
           # Update the package database and install required dependencies
           sudo apt-get update
@@ -72,5 +69,5 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-      - name: Verify Docker installation
+      - name: Verify Docker installation (Latest Version)
         run: docker --version
