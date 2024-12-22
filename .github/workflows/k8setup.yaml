@@ -27,7 +27,7 @@ jobs:
 
       - name: Re-add Kubernetes GPG key (if needed)
         run: |
-          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes.gpg
 
       - name: Update package database
         run: |
