@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-    - name: Remove conflicting Kubernetes GPG key (if exists)
+    - name: Remove conflicting Kubernetes GPG key
       run: |
         sudo rm -f /etc/apt/keyrings/kubernetes.gpg
 
