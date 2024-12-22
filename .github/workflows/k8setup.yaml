@@ -23,15 +23,18 @@ jobs:
 
       - name: Install Kubernetes and fix GPG key
         run: |
-          # Remove old GPG key if it exists
-          sudo apt-key del 234654DA9A296436 || true
-          
-          # Add the new GPG key for Kubernetes
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          
+          # Clean up any old Kubernetes GPG keys that might be conflicting
+          sudo rm -f /etc/apt/keyrings/kubernetes.gpg
+
+          # Remove the old Kubernetes repository
+          sudo sed -i '/apt.kubernetes.io/d' /etc/apt/sources.list /etc/apt/sources.list.d/*
+
+          # Add the correct GPG key for Kubernetes
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes.gpg > /dev/null
+
           # Add the Kubernetes repository
-          sudo apt-add-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-          
+          echo "deb [signed-by=/etc/apt/keyrings/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
           # Update package list
           sudo apt update
 
