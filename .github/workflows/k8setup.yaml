@@ -83,7 +83,7 @@ jobs:
         run: |
           sudo curl -O https://docs.projectcalico.org/manifests/calico.yaml
           export KUBECONFIG=$HOME/admin.conf
-          kubectl apply -f calico.yaml
+          kubectl apply -f calico.yaml --validate=false
           kubectl taint nodes --all node-role.kubernetes.io/control-plane-
           kubectl taint nodes --all key:NoSchedule-
 
