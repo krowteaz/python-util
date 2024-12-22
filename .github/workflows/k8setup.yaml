@@ -1,4 +1,4 @@
-name: Install kubectl
+name: Install kubectl, Docker, and Initialize Kubernetes
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  install_kubectl:
-    runs-on: self-hosted
+  install_kubectl_docker_and_k8s:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -17,6 +17,11 @@ jobs:
       run: |
         K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
         curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
+
+    - name: Validate kubectl binary
+      run: |
+        curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl.sha256"
+        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
 
     - name: Install kubectl
       run: |
@@ -34,3 +39,35 @@ jobs:
 
     - name: Verify Docker installation
       run: docker --version
+
+    - name: Install kubeadm, kubelet, and kubectl
+      run: |
+        sudo apt update
+        sudo apt install -y apt-transport-https curl
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/trusted.gpg.d/kubernetes.asc
+        sudo apt update
+        sudo apt install -y kubelet kubeadm kubectl
+
+    - name: Initialize Kubernetes master node
+      run: |
+        sudo kubeadm init
+
+    - name: Set up kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+    - name: Verify Kubernetes setup
+      run: kubectl get nodes
+
+    - name: Install Docker
+      run: |
+        sudo apt update
+        sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
+        sudo sh -c "echo 'deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable' > /etc/apt/sources.list.d/docker.list"
+        sudo apt update
+        sudo apt install -y docker-ce docker-ce-cli containerd.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
