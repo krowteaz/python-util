@@ -7,7 +7,7 @@ on:
 
 jobs:
   install_kubectl_docker_and_k8s:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
