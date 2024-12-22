@@ -79,10 +79,11 @@ jobs:
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
 
-      - name: Install Calico Network
+      - name: Download Calico YAML and Apply Calico YAML with kubectl
         run: |
+          curl -O https://docs.projectcalico.org/manifests/calico.yaml
           export KUBECONFIG=$HOME/admin.conf
-          sudo kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-          sudo kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-          sudo kubectl taint nodes --all key:NoSchedule
+          kubectl apply -f calico.yaml
+          kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+          kubectl taint nodes --all key:NoSchedule-
 
