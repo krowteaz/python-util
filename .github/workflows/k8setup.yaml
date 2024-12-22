@@ -75,7 +75,7 @@ jobs:
           sudo kubeadm init
           sudo cp /etc/kubernetes/admin.conf $HOME/
           sudo chown $(id -u):$(id -g) $HOME/admin.conf
-          export KUBECONFIG=$HOME/admin.conf
+          sudo export KUBECONFIG=$HOME/admin.conf
           echo 'export KUBECONFIG=$HOME/admin.conf' >> $HOME/.bashrc
           echo "Check Status of Cluster"
           kubectl get nodes
