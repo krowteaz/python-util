@@ -13,34 +13,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-    - name: Remove conflicting Kubernetes GPG key
-      run: |
-        sudo rm -f /etc/apt/keyrings/kubernetes.gpg
+      - name: Remove conflicting Kubernetes GPG key
+        run: |
+          sudo rm -f /etc/apt/keyrings/kubernetes.gpg
 
-    - name: Add Docker GPG key
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      - name: Add Docker GPG key
+        run: |
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-    - name: Set up Docker repository
-      run: |
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      - name: Set up Docker repository
+        run: |
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    - name: Re-add Kubernetes GPG key (if needed)
-      run: |
-        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
+      - name: Re-add Kubernetes GPG key (if needed)
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes.gpg
 
-    - name: Update package database
-      run: |
-        sudo apt-get update
+      - name: Update package database
+        run: |
+          sudo apt-get update
 
-    - name: Install Docker dependencies
-      run: |
-        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+      - name: Install Docker dependencies
+        run: |
+          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
-    - name: Install Docker
-      run: |
-        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-  
+      - name: Install Docker
+        run: |
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
       - name: Download kubectl binary
         run: |
           K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
@@ -53,7 +53,7 @@ jobs:
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
 
-      - name: Install Docker
+      - name: Install Docker (alternative)
         run: |
           sudo apt update
           sudo apt -y install docker.io
@@ -80,4 +80,3 @@ jobs:
           mkdir -p $HOME/.kube
           sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
           sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
