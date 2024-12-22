@@ -15,8 +15,11 @@ jobs:
 
       - name: Install kubectl
         run: |
+          # Fetch the latest stable version of kubectl
+          VERSION=$(curl -s https://dl.k8s.io/release/stable.txt)
+          
           # Download the latest stable version of kubectl
-          curl -LO "https://dl.k8s.io/release/v$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/release/${VERSION}/bin/linux/amd64/kubectl"
           
           # Make kubectl executable
           chmod +x ./kubectl
