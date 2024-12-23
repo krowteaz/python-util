@@ -68,9 +68,9 @@ jobs:
       - name: Remove existing Kubernetes master node
         run: |
           sudo kubeadm reset -f
-          rm -rf  /etc/cni/net.d
+          sudo rm -rf  /etc/cni/net.d
+          sudo rm $HOME/.kube/config
           rm $HOME/.kube/config
-
 
       - name: Initialize Kubernetes master node
         run: |
