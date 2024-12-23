@@ -21,11 +21,13 @@ jobs:
             echo "No Docker packages found to remove."
           fi
 
-      # Step 2: Remove Kubernetes packages if installed
+      # Step 2: Remove Kubernetes and Kubeadm if installed
       - name: Remove Kubernetes and Kubeadm if installed
         run: |
           if dpkg-query -l | grep -q -E 'kubeadm|kubelet|kubectl|kubernetes'; then
             echo "Removing Kubernetes and Kubeadm..."
+            # Unhold any held packages
+            sudo apt-mark unhold kubeadm kubectl kubelet || true
             sudo apt-get remove --purge -y kubeadm kubelet kubectl kubernetes
             sudo rm -f /etc/apt/sources.list.d/kubernetes.list
           else
