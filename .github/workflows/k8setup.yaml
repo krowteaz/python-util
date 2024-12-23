@@ -39,22 +39,19 @@ jobs:
           K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
           curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
           
-      - name: Install Docker
+      - name: Install Docker and verify version
         run: |
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
           sudo systemctl enable docker
           sudo systemctl start docker
           docker --version
 
-      - name: Verify kubectl installation
-        run: kubectl version --client --output=yaml
-
-      - name: Verify Docker installation
-        run: docker --version
-
       - name: Install kubeadm, kubelet, and kubectl
         run: |
           sudo apt install -y kubelet kubeadm kubectl
+
+      - name: Verify kubectl installation
+        run: kubectl version --client --output=yaml
 
       - name: Install and configure containerd
         run: |
