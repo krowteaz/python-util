@@ -97,6 +97,7 @@ jobs:
 
       - name: Untaint Control-Plane Nodes
         run: |
+          export KUBECONFIG=$HOME/admin.conf
           kubectl taint nodes --all node-role.kubernetes.io/control-plane-
           kubectl taint nodes --all key:NoSchedule-
 
