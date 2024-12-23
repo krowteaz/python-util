@@ -1,36 +1,44 @@
-name: Remove Kubernetes and Docker
+name: Remove Kubernetes, Kubeadm, and Docker
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  remove_kubernetes_docker:
+  remove-k8s-docker:
     runs-on: self-hosted
 
     steps:
-    - name: Set up the environment
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl gnupg lsb-release
+      # Step 1: Check if Docker is installed and remove it
+      - name: Remove Docker if installed
+        run: |
+          if dpkg-query -l | grep -q -E 'docker|docker-engine|docker.io|containerd'; then
+            echo "Removing Docker and related packages..."
+            sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc
+            sudo rm -f /etc/apt/sources.list.d/docker.list
+          else
+            echo "No Docker packages found to remove."
+          fi
 
-    - name: Remove Kubernetes (for self-managed cluster)
-      run: |
-        # Stopping and removing kubelet and kubectl
-        sudo systemctl stop kubelet
-        sudo apt-get purge -y kubelet kubectl kubeadm kubernetes-cni
-        sudo apt-get autoremove -y
-        sudo rm -rf /etc/kubernetes /var/lib/etcd /var/lib/kubelet
-        sudo systemctl daemon-reload
+      # Step 2: Remove Kubernetes packages if installed
+      - name: Remove Kubernetes and Kubeadm if installed
+        run: |
+          if dpkg-query -l | grep -q -E 'kubeadm|kubelet|kubectl|kubernetes'; then
+            echo "Removing Kubernetes and Kubeadm..."
+            sudo apt-get remove --purge -y kubeadm kubelet kubectl kubernetes
+            sudo rm -f /etc/apt/sources.list.d/kubernetes.list
+          else
+            echo "No Kubernetes packages found to remove."
+          fi
 
-    - name: Remove Docker
-      run: |
-        # Uninstalling Docker packages
-        sudo apt-get remove -y docker docker-engine docker.io containerd runc
-        sudo apt-get purge -y docker docker-engine docker.io containerd runc
-        sudo apt-get autoremove -y
-        sudo rm -rf /var/lib/docker /etc/docker /var/run/docker.sock
+      # Step 3: Clean up unused dependencies
+      - name: Clean up unused packages and dependencies
+        run: |
+          sudo apt-get autoremove -y
+          sudo apt-get clean
 
-    - name: Clean up
-      run: |
-        sudo apt-get clean
-        sudo rm -rf /var/cache/apt/archives/*
+      # Step 4: Update package lists
+      - name: Update package lists
+        run: |
+          sudo apt-get update
