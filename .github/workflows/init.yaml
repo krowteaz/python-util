@@ -45,29 +45,11 @@ jobs:
           sudo systemctl enable docker
           sudo systemctl start docker
           docker --version
-
-      - name: Reconfigure Kubernetes APT repository
-        run: |
-          # Install necessary dependencies
-          sudo apt-get install -y apt-transport-https curl
-          
-          # Add Kubernetes repository key
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          
-          # Add Kubernetes repository to sources list
-          sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
-          
-          # Update APT repository
-          sudo apt-get update
-      
-      - name: Install Kubernetes components (kubelet, kubeadm, kubectl)
-        run: |
-          # Update package lists to include Kubernetes packages
-          sudo apt-get update
         
       - name: Install kubeadm, kubelet, and kubectl
         run: |
           sudo apt install -y kubelet kubeadm kubectl
+          
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
 
