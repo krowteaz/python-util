@@ -13,6 +13,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Remove old Docker and Kubernetes versions
+        run: |
+          sudo apt-get remove --purge docker docker-engine docker.io containerd runc -y
+          sudo rm /etc/apt/sources.list.d/kubernetes.list
+          sudo apt-get update
+
+      - name: Reconfigure Kubernetes repository (if needed)
+        run: |
+          sudo apt-get update && sudo apt-get install -y apt-transport-https
+          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
+          sudo apt-get update
+
+      - name: Install Docker CE
+        run: |
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Restart Docker service
+        run: |
+          sudo systemctl daemon-reload
+          sudo systemctl enable docker
+          sudo systemctl start docker
+
+      - name: Check Docker status
+        run: |
+          sudo systemctl status docker
+          sudo journalctl -xeu docker.service
+
       - name: Remove conflicting Kubernetes GPG key and sourcelist.d
         run: |
           sudo rm -f /etc/apt/keyrings/kubernetes.gpg
@@ -94,23 +122,3 @@ jobs:
       - name: Install Telnet
         run: |
           sudo apt-get install -y telnet
-
-      - name: Remove old Docker versions
-        run: |
-          sudo apt-get remove --purge docker docker-engine docker.io containerd runc -y
-          sudo apt-get update
-
-      - name: Install Docker CE
-        run: |
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-      - name: Restart Docker service
-        run: |
-          sudo systemctl daemon-reload
-          sudo systemctl enable docker
-          sudo systemctl start docker
-
-      - name: Check Docker status
-        run: |
-          sudo systemctl status docker
-          sudo journalctl -xeu docker.service
