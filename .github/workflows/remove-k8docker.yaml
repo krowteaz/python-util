@@ -40,7 +40,29 @@ jobs:
           sudo apt-get autoremove -y
           sudo apt-get clean
 
-      # Step 4: Update package lists
-      - name: Update package lists
+      # Step 4: Remove old Kubernetes packages
+      - name: Remove old Kubernetes packages
         run: |
+          # Remove Kubernetes-related packages
+          sudo apt-get remove --purge -y kubeadm kubelet kubectl kubernetes
+          # Clean up any residual configuration files
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf /etc/kubernetes
+          sudo rm -f /etc/apt/sources.list.d/kubernetes.list
+
+      # Step 5: Remove Kubernetes GPG key and reconfigure repository
+      - name: Remove Kubernetes GPG key and reconfigure repository
+        run: |
+          # Remove Kubernetes GPG key
+          sudo apt-key del 7BB9C367
+          
+          # Ensure that the old Kubernetes repository is removed
+          sudo rm -f /etc/apt/sources.list.d/kubernetes.list
+          
+          # Reconfigure the repository (optional, depending on need)
+          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          
+          # Update package list after removal
           sudo apt-get update
+
