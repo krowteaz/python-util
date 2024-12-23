@@ -3,7 +3,7 @@ name: Remove Kubernetes, Kubeadm, and Docker
 on:
   push:
     branches:
-      - main
+      - #main
 
 jobs:
   remove-k8s-docker:
