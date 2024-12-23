@@ -1,7 +1,7 @@
 name: Python Util
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '0 0 * * *' # Runs every day
   workflow_dispatch: # Allows manual trigger of the workflow
 
 jobs:
