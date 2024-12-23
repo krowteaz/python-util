@@ -15,15 +15,26 @@ jobs:
 
       - name: Remove old Docker and Kubernetes versions
         run: |
-          sudo apt-get remove --purge docker docker-engine docker.io containerd runc -y
-          sudo rm /etc/apt/sources.list.d/kubernetes.list
-          sudo apt-get update
+          # Remove old Docker and Kubernetes versions only if they exist
+          if dpkg-query -l | grep -q -E 'docker|kubernetes'; then
+            sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc
+            sudo rm -f /etc/apt/sources.list.d/kubernetes.list
+            sudo apt-get update
+          else
+            echo "No old Docker or Kubernetes versions found to remove."
+          fi
 
       - name: Reconfigure Kubernetes repository (if needed)
         run: |
-          sudo apt-get update && sudo apt-get install -y apt-transport-https
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          sudo bash -c 'echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list'
+          # Check if the Kubernetes repository exists, if not add it
+          if [ ! -f /etc/apt/sources.list.d/kubernetes.list ]; then
+            echo "Reconfiguring Kubernetes repository..."
+            sudo apt-get update && sudo apt-get install -y apt-transport-https
+            curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          else
+            echo "Kubernetes repository already configured."
+          fi
           sudo apt-get update
 
       - name: Install Docker CE
