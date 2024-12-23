@@ -91,14 +91,12 @@ jobs:
           kubectl taint nodes --all node-role.kubernetes.io/control-plane-
           kubectl taint nodes --all key:NoSchedule
 
+      - name: Install Telnet
+        run: |
+          sudo apt-get install -y telnet
+
       - name: Install Docker and verify version
         run: |
-          sudo apt-get remove --purge docker docker-engine docker.io containerd runc -y
-          sudo apt-get update
-          sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
           sudo systemctl start docker
           sudo systemctl enable docker
