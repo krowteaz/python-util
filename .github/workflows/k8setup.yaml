@@ -68,6 +68,7 @@ jobs:
       - name: Install kubeadm, kubelet, and kubectl
         run: |
           sudo apt install -y kubelet kubeadm kubectl
+          
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
 
@@ -79,12 +80,14 @@ jobs:
           sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
           sudo systemctl daemon-reload
           sudo systemctl restart containerd
+          
       - name: Remove existing Kubernetes master node
         run: |
           sudo kubeadm reset -f || true
           sudo rm -rf /etc/cni/net.d || true
           sudo rm -f $HOME/.kube/config || true
           rm -f $HOME/.kube/config || true
+          
       - name: Initialize Kubernetes master node
         run: |
           sudo kubeadm init
@@ -93,6 +96,7 @@ jobs:
           echo 'export KUBECONFIG=$HOME/admin.conf' >> $HOME/.bashrc
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
+          
       - name: Install curl
         run: sudo apt-get install -y curl
 
@@ -105,6 +109,7 @@ jobs:
           else
             echo "Calico manifest download failed." && exit 1
           fi
+          
       - name: Untaint Control-Plane Nodes
         run: |
           export KUBECONFIG=$HOME/admin.conf
