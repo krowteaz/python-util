@@ -95,10 +95,22 @@ jobs:
         run: |
           sudo apt-get install -y telnet
 
-      - name: Install Docker and verify version
+      - name: Remove old Docker versions
+        run: |
+          sudo apt-get remove --purge docker docker-engine docker.io containerd runc -y
+          sudo apt-get update
+
+      - name: Install Docker CE
         run: |
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-          sudo systemctl start docker
+
+      - name: Restart Docker service
+        run: |
+          sudo systemctl daemon-reload
           sudo systemctl enable docker
-          sudo systemctl start containerd
-          sudo systemctl enable containerd
+          sudo systemctl start docker
+
+      - name: Check Docker status
+        run: |
+          sudo systemctl status docker
+          sudo journalctl -xeu docker.service
