@@ -13,75 +13,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Remove old Docker and Kubernetes versions
-        run: |
-          # Remove old Docker and Kubernetes versions only if they exist
-          if dpkg-query -l | grep -q -E 'docker|kubernetes'; then
-            sudo apt-get remove --purge -y docker docker-engine docker.io containerd runc
-            sudo rm -f /etc/apt/sources.list.d/kubernetes.list
-            sudo apt-get update
-          else
-            echo "No old Docker or Kubernetes versions found to remove."
-          fi
-
-      - name: Reconfigure Kubernetes repository (if needed)
-        run: |
-          # Check if the Kubernetes repository exists, if not add it
-          if [ ! -f /etc/apt/sources.list.d/kubernetes.list ]; then
-            echo "Reconfiguring Kubernetes repository..."
-            sudo apt-get update && sudo apt-get install -y apt-transport-https
-            curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-          else
-            echo "Kubernetes repository already configured."
-          fi
-          sudo apt-get update
-
-      - name: Install Docker CE
-        run: |
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-      - name: Restart Docker service
-        run: |
-          sudo systemctl daemon-reload
-          sudo systemctl enable docker
-          sudo systemctl start docker
-
-      - name: Check Docker status
-        run: |
-          sudo systemctl status docker
-          sudo journalctl -xeu docker.service
-
       - name: Remove conflicting Kubernetes GPG key and sourcelist.d
         run: |
           sudo rm -f /etc/apt/keyrings/kubernetes.gpg
           sudo rm -rf /etc/apt/sources.list.d/*
-
       - name: Add Docker GPG key
         run: |
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/docker-archive-keyring.gpg
-
       - name: Set up Docker repository
         run: |
           echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
       - name: Re-add Kubernetes GPG key (if needed)
         run: |
           curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /etc/apt/keyrings/kubernetes.gpg
-
       - name: Install Docker dependencies
         run: |
           sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
       - name: Download kubectl binary
         run: |
           K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
           curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
-
+          
+      - name: Install Docker and verify version
+        run: |
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo systemctl enable docker
+          sudo systemctl start docker
+          docker --version
       - name: Install kubeadm, kubelet, and kubectl
         run: |
           sudo apt install -y kubelet kubeadm kubectl
-
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
 
@@ -93,15 +54,12 @@ jobs:
           sudo sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
           sudo systemctl daemon-reload
           sudo systemctl restart containerd
-
       - name: Remove existing Kubernetes master node
         run: |
           sudo kubeadm reset -f || true
           sudo rm -rf /etc/cni/net.d || true
           sudo rm -f $HOME/.kube/config || true
           rm -f $HOME/.kube/config || true
-
-
       - name: Initialize Kubernetes master node
         run: |
           sudo kubeadm init
@@ -110,7 +68,6 @@ jobs:
           echo 'export KUBECONFIG=$HOME/admin.conf' >> $HOME/.bashrc
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
-
       - name: Install curl
         run: sudo apt-get install -y curl
 
@@ -123,7 +80,6 @@ jobs:
           else
             echo "Calico manifest download failed." && exit 1
           fi
-
       - name: Untaint Control-Plane Nodes
         run: |
           export KUBECONFIG=$HOME/admin.conf
