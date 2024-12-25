@@ -53,15 +53,15 @@ jobs:
 
       - name: Update apt package list
         run: sudo apt-get update
-          
-      - name: Verify kubectl installation
-        run: kubectl version --client --output=yaml
       
       - name: Install Kubelet, kubectl and kubeadm via Snap (Ubuntu 24)
         run: |
           snap install kubelet --classic
           snap install kubeadm --classic
           snap install kubectl --classic
+
+      - name: Verify kubectl installation
+        run: kubectl version --client --output=yaml
 
       - name: Install and configure containerd
         run: |
