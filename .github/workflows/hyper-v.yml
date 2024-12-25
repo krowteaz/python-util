@@ -36,6 +36,7 @@ jobs:
           
       - name: Install Docker and verify version
         run: |
+          sudo -S apt-get update
           sudo -S apt-get install -y docker-ce docker-ce-cli containerd.io
           sudo -S systemctl enable docker
           sudo -S systemctl start docker
