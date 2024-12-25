@@ -59,6 +59,7 @@ jobs:
           sudo snap install kubelet --classic
           sudo snap install kubeadm --classic
           sudo snap install kubectl --classic
+          sudo systemctl enable kubelet.service
 
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
