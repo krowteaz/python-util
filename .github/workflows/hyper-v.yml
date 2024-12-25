@@ -62,14 +62,15 @@ jobs:
 
       - name: Update apt package list
         run: sudo apt-get update
-        
-      - name: Install kubeadm, kubelet, and kubectl
-        run: |
-          sudo apt-get install -y kubelet kubeadm kubectl
-          sudo apt-mark hold kubelet kubeadm kubectl
           
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
+      
+      - name: Install Kubelet, kubectl and kubeadm via Snap (Ubuntu 24)
+        run: |
+          snap install kubelet
+          snap install kubeadm
+          snap install kubectl
 
       - name: Install and configure containerd
         run: |
