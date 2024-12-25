@@ -1,4 +1,4 @@
-name: HyperV Install kubectl, Docker, and Initialize Kubernetes
+name: Hyper-V (Install Docker, K8s and Initialize Kubernetes)
 
 on:
   push:
