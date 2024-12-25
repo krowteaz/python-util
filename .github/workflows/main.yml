@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-status:
-    runs-on: self-hosted
+    runs-on: ubuntu-vm
 
     steps:
       - name: Checkout Repository
