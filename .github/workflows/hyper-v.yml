@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-vm #name of self-hosted runner
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Modify sudoers for sgadmin
         run: |
@@ -68,9 +66,9 @@ jobs:
       
       - name: Install Kubelet, kubectl and kubeadm via Snap (Ubuntu 24)
         run: |
-          snap install kubelet
-          snap install kubeadm
-          snap install kubectl
+          snap install kubelet --classic
+          snap install kubeadm --classic
+          snap install kubectl --classic
 
       - name: Install and configure containerd
         run: |
@@ -89,9 +87,6 @@ jobs:
           echo 'export KUBECONFIG=$HOME/admin.conf' >> $HOME/.bashrc
           export KUBECONFIG=$HOME/admin.conf
           kubectl get nodes
-          
-      - name: Install curl
-        run: sudo -S apt-get install -y curl
 
       - name: Download and Apply Calico
         run: |
@@ -102,6 +97,7 @@ jobs:
           else
             echo "Calico manifest download failed." && exit 1
           fi
+          
       - name: Untaint Control-Plane Nodes
         run: |
           export KUBECONFIG=$HOME/admin.conf
