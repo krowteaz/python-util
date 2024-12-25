@@ -13,6 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Debug Permissions
+        run: |
+          whoami
+          sudo -l
+
       - name: Remove conflicting Kubernetes GPG key and sourcelist.d
         run: |
           sudo rm -f /etc/apt/keyrings/kubernetes.gpg
