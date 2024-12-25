@@ -51,6 +51,17 @@ jobs:
           sudo -S systemctl enable docker
           sudo -S systemctl start docker
           docker --version
+
+      - name: Add Kubernetes GPG key
+        run: |
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+      - name: Add Kubernetes APT repository
+        run: |
+          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+      - name: Update apt package list
+        run: sudo apt-get update
         
       - name: Install kubeadm, kubelet, and kubectl
         run: |
