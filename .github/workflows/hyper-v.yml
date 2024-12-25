@@ -20,6 +20,7 @@ jobs:
         run: |
           sudo rm -f /etc/apt/keyrings/kubernetes.gpg
           sudo rm -rf /etc/apt/sources.list.d/*
+          sudo rm /etc/apt/sources.list.d/kubernetes.list
       
       - name: Add Docker GPG key
         run: |
