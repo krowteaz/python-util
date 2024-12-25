@@ -1,4 +1,4 @@
-name: Hyper-V - Install kubectl, Docker, and Initialize Kubernetes
+name: HyperV Install kubectl, Docker, and Initialize Kubernetes
 
 on:
   push:
@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Configure sudo to not require a password
+        run: |
+          echo "sgadmin ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/sgadmin
       
       - name: Add Docker GPG key
         run: |
