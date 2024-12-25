@@ -16,11 +16,11 @@ jobs:
           echo "sgadmin ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/sgadmin
           sudo chmod 0440 /etc/sudoers.d/sgadmin
 
-      - name: Remove conflicting Kubernetes GPG key and sourcelist.d
+      - name: Remove conflicting Kubernetes GPG key and sourcelist.d if existing
         run: |
-          sudo rm -f /etc/apt/keyrings/kubernetes.gpg
-          sudo rm -rf /etc/apt/sources.list.d/*
-          sudo rm /etc/apt/sources.list.d/kubernetes.list
+          sudo rm -f /etc/apt/keyrings/kubernetes.gpg || true
+          sudo rm -rf /etc/apt/sources.list.d/* || true
+          sudo rm /etc/apt/sources.list.d/kubernetes.list || true
       
       - name: Add Docker GPG key
         run: |
