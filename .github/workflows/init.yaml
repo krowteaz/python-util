@@ -18,10 +18,10 @@ jobs:
           whoami
           sudo -l
 
-  #    - name: Remove conflicting Kubernetes GPG key and sourcelist.d
-  #       run: |
-  #        sudo rm -f /etc/apt/keyrings/kubernetes.gpg
-  #        sudo rm -rf /etc/apt/sources.list.d/*
+      - name: Remove conflicting Kubernetes GPG key and sourcelist.d
+         run: |
+          sudo rm -f /etc/apt/keyrings/kubernetes.gpg
+          sudo rm -rf /etc/apt/sources.list.d/*
           
       - name: Add Docker GPG key
         run: |
