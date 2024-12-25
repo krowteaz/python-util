@@ -54,7 +54,8 @@ jobs:
         
       - name: Install kubeadm, kubelet, and kubectl
         run: |
-          sudo -S apt install -y kubelet kubeadm kubectl
+          sudo apt-get install -y kubelet kubeadm kubectl
+          sudo apt-mark hold kubelet kubeadm kubectl
           
       - name: Verify kubectl installation
         run: kubectl version --client --output=yaml
